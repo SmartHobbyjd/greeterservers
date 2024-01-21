@@ -13,7 +13,7 @@ syntax = "proto3";
 package greetings;
 
 // Specify the Go package for the generated code.
-option go_package = "go_service/proto/greetingsgo_service/proto/greetings";
+option go_package = "go_service/proto/greetings";
 
 service Greeter {
   rpc SayHello (HelloRequest) returns (HelloReply) {}
@@ -36,12 +36,12 @@ message ThankYouRequest {
 message WelcomeReply {
   string message = 1;
 }
+
 EOF
 
 # Create client_service/main.go file
 cat <<'EOF' > client_service/main.go
 // client_service/main.go
-
 package main
 
 import (
