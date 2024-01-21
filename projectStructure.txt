@@ -1,0 +1,32 @@
+your_project_root/
+├── README.md
+├── check_versions.sh
+├── create_services.sh
+├── docker-compose.yml
+├── proto/
+│       ├── greetings.proto
+├── go_service/
+│   ├── go.mod
+│   ├── main.go 
+│       ├── greetings/
+│       │   ├── greetings.pb.go
+│       │   └── greetings_grpc.pb.go
+├── rust_service/
+│   ├── Dockerfile
+│   ├── Cargo.toml
+|   ├── build.rs
+│   └── src/
+│       └── main.rs
+├── python_service/
+│   ├── Dockerfile
+│   └── main.py
+|   └── greetings_pb2_grpc.py
+|   └── greetings_pb2.py
+|   └── requirements.txt
+├── client_service/
+│   │   ├── go.mod
+│   │   ├── main.go
+│   │   └── Dockerfile
+│   │   ├── sqlite_handler.go
+│   │   ├── go.mod
+│   │   └── go.sum
