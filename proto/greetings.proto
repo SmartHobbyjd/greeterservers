@@ -3,7 +3,7 @@ syntax = "proto3";
 package greetings;
 
 // Specify the Go package for the generated code.
-option go_package = "go_service/proto/greetings";
+option go_package = "proto/greetings";
 
 service Greeter {
   rpc SayHello (HelloRequest) returns (HelloReply) {}
