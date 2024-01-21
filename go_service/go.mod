@@ -3,7 +3,6 @@ module github.com/SmartHobbyjd/greeterservers/go_service
 go 1.20
 
 require (
-	github.com/SmartHobbyjd/greeterservers v0.0.0-20240121192634-0883ea314948 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
