@@ -438,6 +438,16 @@ services:
     ports:
       - "50053:50053"
     container_name: python_service_container
+
+  go_client_service:
+    build:
+      context: .
+      dockerfile: client_service/Dockerfile  # Specify the path to your Go client Dockerfile
+    ports:
+      - "8585:8585"  # Specify the desired port for your Go client
+    container_name: go_client_container
+    depends_on:
+      - go_service  # Ensure that the Go client service starts after the Go server service
 EOF
 
 # Create .github/workflows/ci.yml file
@@ -488,7 +498,7 @@ cd go_service
 
     # Compile .proto file for Go
     #protoc --go_out=plugins=grpc:go_service proto/greetings.proto
-    protoc --go_out=. --go-grpc_out=. --proto_path=../proto ../proto/greetings.proto
+    protoc --go_out=. --go-grpc_out=. --proto_path=../proto ../greetings.proto
 
     # Move generated Go files to the go_service directory
     #mv ./proto/greetings.pb.go go_service/
@@ -568,4 +578,27 @@ RUN cargo install --path .
 EXPOSE 50052
 
 CMD ["rust_service"]
+EOF
+
+# Create client_service Dockerfile
+cat <<'EOF' > client_service/Dockerfile
+# Use an official Golang runtime as a parent image
+FROM golang:latest
+
+# Set the working directory inside the container
+WORKDIR /go/src/app
+
+# Copy the local Go code into the container
+COPY . .
+
+# Install any dependencies if needed (e.g., go get ...)
+
+# Build the Go application
+RUN go build -o main .
+
+# Expose port 8585 for the Go client to listen on
+EXPOSE 8585
+
+# Run the Go client on port 8585 when the container starts
+CMD ["./main", "-port", "8585"]
 EOF
