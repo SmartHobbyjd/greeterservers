@@ -17,3 +17,29 @@ check_version "Rust" "rustc --version"
 
 # Check Python version
 check_version "Python" "python3 --version"
+
+# Check Python version
+check_version "Docker" "docker --version"
+
+# Display information
+echo "Made by Jackson Dias"
+echo "Mentorshipfortycoons.com"
+echo "GitHub: github.com/smarthobbyjd"
+echo "Visit: jackdsondias.tech"
+
+# Open a URL
+URL="http://www.jacksondias.tech"
+
+# Detect the operating system
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    open $URL
+elif [[ "$OSTYPE" == "linux-gnu" ]]; then
+    # Linux
+    xdg-open $URL
+elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+    # Windows
+    start $URL
+else
+    echo "Unsupported operating system"
+fi

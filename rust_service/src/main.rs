@@ -4,7 +4,10 @@ pub mod hello_world {
     tonic::include_proto!("greetings");
 }
 
-use hello_world::{greeter_server::{Greeter, GreeterServer}, HelloRequest, HelloReply};
+use hello_world::{
+    greeter_server::{Greeter, GreeterServer},
+    HelloRequest, HelloReply, ThankYouRequest, WelcomeReply,
+};
 
 #[derive(Default)]
 pub struct MyGreeter {}
@@ -17,6 +20,24 @@ impl Greeter for MyGreeter {
     ) -> Result<Response<HelloReply>, Status> {
         Ok(Response::new(HelloReply {
             message: format!("Hi from Rust"),
+        }))
+    }
+
+    async fn say_hi(
+        &self,
+        request: Request<HelloReply>,
+    ) -> Result<Response<HelloReply>, Status> {
+        Ok(Response::new(HelloReply {
+            message: format!("Hi back from Rust!"),
+        }))
+    }
+
+    async fn say_thank_you(
+        &self,
+        request: Request<ThankYouRequest>,
+    ) -> Result<Response<WelcomeReply>, Status> {
+        Ok(Response::new(WelcomeReply {
+            message: format!("You're welcome in Rust!"),
         }))
     }
 }

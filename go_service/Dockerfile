@@ -2,11 +2,14 @@ FROM golang:latest
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+# Copy the Go module files and download dependencies
+COPY ./go_service/go.mod ./go_service/go.sum ./
 RUN go mod download
 
-COPY . .
+# Copy the entire service code
+COPY ./go_service/ .
 
+# Build the application
 RUN go build -o main .
 
 EXPOSE 50051
