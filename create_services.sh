@@ -495,15 +495,15 @@ cd go_service
 
  go get github.com/golang/protobuf/protoc-gen-go
 
+    # Move generated Go files to the go_service directory
+    #mv ./proto/greetings.pb.go go_service/
+    #mv ./proto/greetings_grpc.pb.go go_service/
+cd ..
 
     # Compile .proto file for Go
     #protoc --go_out=plugins=grpc:go_service proto/greetings.proto
     protoc --go_out=. --go-grpc_out=. --proto_path=../proto ../greetings.proto
 
-    # Move generated Go files to the go_service directory
-    #mv ./proto/greetings.pb.go go_service/
-    #mv ./proto/greetings_grpc.pb.go go_service/
-cd ..
 
 cd python_service
 # Create requirements.txt file
