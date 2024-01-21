@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Delete existing directories
-rm -rf go_service rust_service python_service proto rust_service/src
+rm -rf go_service rust_service python_service proto rust_service/src .github/workflows
 
 # Create directories
-mkdir -p go_service rust_service python_service proto rust_service/src
+mkdir -p go_service rust_service python_service proto rust_service/src .github/workflows
 
 # Create .proto file
 cat <<'EOF' > proto/greetings.proto
@@ -45,7 +45,7 @@ import (
     "net"
 
     "google.golang.org/grpc"
-    pb "proto/greetings"
+    pb "github.com/SmartHobbyjd/greeterservers/go_service/proto/greetings"
 )
 
 type server struct {
@@ -57,19 +57,6 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 }
 
 func main() {
-    # Initialize Go module
-    go mod init github.com/yourusername/go_service
-
-    # Install Go dependencies
-    go get -u google.golang.org/grpc
-
-    # Compile .proto file for Go
-    protoc --go_out=plugins=grpc:go_service proto/greetings.proto
-
-    # Move generated Go files to the go_service directory
-    mv proto/greetings.pb.go go_service/
-    mv proto/greetings_grpc.pb.go go_service/
-
     lis, err := net.Listen("tcp", ":50051")
     if err != nil {
         log.Fatalf("failed to listen: %v", err)
@@ -81,7 +68,39 @@ func main() {
     }
 }
 EOF
+cd go_service
+    # Initialize Go module
+    go mod init github.com/SmartHobbyjd/greeterservers/go_service
 
+    # Install Go dependencies
+    go get -u google.golang.org/grpc
+
+    cd ..
+
+    # Compile .proto file for Go
+    protoc --go_out=plugins=grpc:go_service proto/greetings.proto
+
+    # Move generated Go files to the go_service directory
+    mv proto/greetings.pb.go go_service/
+    mv proto/greetings_grpc.pb.go go_service/
+
+# Create go_service Dockerfile
+cat <<'EOF' > go_service/Dockerfile
+FROM golang:latest
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN go build -o main .
+
+EXPOSE 50051
+
+CMD ["./main"]
+EOF
 
 # Create Rust service file
 cat <<'EOF' > rust_service/src/main.rs
@@ -130,8 +149,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 EOF
 
-# Cargo.toml in the rust_service directory
-
+# Create Cargo.toml for Rust service
+cat <<EOF > rust_service/Cargo.toml
 [package]
 name = "rust_service"
 version = "0.1.0"
@@ -144,7 +163,22 @@ tokio = { version = "1", features = ["full"] }
 
 [build-dependencies]
 tonic-build = "0.6"
+EOF
 
+# Create Rust service Dockerfile
+cat <<'EOF' > rust_service/Dockerfile
+FROM rust:latest
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN cargo install --path .
+
+EXPOSE 50052
+
+CMD ["rust_service"]
+EOF
 
 # Create Python service file
 cat <<'EOF' > python_service/main.py
@@ -176,6 +210,87 @@ pip3 install grpcio-tools
 # Compile .proto file for Python
 python3 -m grpc_tools.protoc -Iproto --python_out=python_service --grpc_python_out=python_service proto/greetings.proto
 
+# Create Python service Dockerfile
+cat <<'EOF' > python_service/Dockerfile
+FROM python:3.9
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 50053
+
+CMD ["python", "./main.py"]
+EOF
+
 # List all files with names and extensions
 echo -e "\nList of Files:"
 find go_service rust_service python_service proto -type f -exec basename {} \;
+
+# Create Docker Compose file
+cat <<'EOF' > docker-compose.yml
+version: '3.8'
+services:
+  go_service:
+    build:
+      context: ./go_service
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    container_name: go_service_container
+
+  rust_service:
+    build:
+      context: ./rust_service
+      dockerfile: Dockerfile
+    ports:
+      - "50052:50052"
+    container_name: rust_service_container
+
+  python_service:
+    build:
+      context: ./python_service
+      dockerfile: Dockerfile
+    ports:
+      - "50053:50053"
+    container_name: python_service_container
+EOF
+
+# Create .github/workflows/ci.yml file
+cat <<'EOF' > .github/workflows/ci.yml
+name: Continuous Integration
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '^1.20'
+
+    - name: Build Go Service
+      run: |
+        cd go_service
+        go build
+
+    - name: Build Python Service
+      run: |
+        cd python_service
+        pip install -r requirements.txt
+        python -m grpc_tools.protoc -I ../proto --python_out=. --grpc_python_out=. ../proto/greetings.proto
+
+    - name: Build Rust Service
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --manifest-path rust_service/Cargo.toml
+EOF
