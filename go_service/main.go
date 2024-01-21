@@ -6,7 +6,7 @@ import (
     "net"
 
     "google.golang.org/grpc"
-    pb "github.com/SmartHobbyjd/greeterservers/"
+    pb "github.com/SmartHobbyjd/greeterservers/go_service/proto/greetings"
 )
 
 type server struct {

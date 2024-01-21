@@ -13,7 +13,7 @@ syntax = "proto3";
 package greetings;
 
 // Specify the Go package for the generated code.
-option go_package = "github.com/SmartHobbyjd/greeterservers/go_service/proto/greetings";
+option go_package = "github.com/SmartHobbyjd/greeterservers/go_service/proto/greetingsgo_service/proto/greetings";
 
 service Greeter {
   rpc SayHello (HelloRequest) returns (HelloReply) {}
@@ -48,7 +48,7 @@ import (
     "net"
 
     "google.golang.org/grpc"
-    pb "github.com/SmartHobbyjd/greeterservers/"
+    pb "github.com/SmartHobbyjd/greeterservers/go_service/proto/greetings"
 )
 
 type server struct {
@@ -250,7 +250,7 @@ EOF
 
 cd go_service
  # Initialize Go module
-    go mod init github.com/SmartHobbyjd/greeterservers/go_service
+    go mod init github.com/SmartHobbyjd/greeterservers/go_service/proto/greetingsgo_service
 
     # Install Go dependencies
     go get -u google.golang.org/grpc

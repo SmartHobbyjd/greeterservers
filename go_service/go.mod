@@ -1,4 +1,4 @@
-module github.com/SmartHobbyjd/greeterservers/go_service
+module github.com/SmartHobbyjd/greeterservers/go_service/proto/greetingsgo_service
 
 go 1.20
 
