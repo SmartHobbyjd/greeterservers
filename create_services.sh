@@ -232,8 +232,7 @@ import (
     "context"
     "fmt"
     "log"
-    "go_service/proto/greetings" // Import the generated Go code
-
+    "../proto/greetings" 
     "google.golang.org/grpc"
 )
 
@@ -502,7 +501,7 @@ cd ..
 
     # Compile .proto file for Go
     #protoc --go_out=plugins=grpc:go_service proto/greetings.proto
-    protoc --go_out=. --go-grpc_out=. --proto_path=../proto ../greetings.proto
+    protoc --go_out=. --go-grpc_out=. proto/greetings.proto
 
 
 cd python_service

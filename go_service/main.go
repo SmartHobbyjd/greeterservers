@@ -4,8 +4,7 @@ import (
     "context"
     "fmt"
     "log"
-    "go_service/proto/greetings" // Import the generated Go code
-
+    "../proto/greetings" 
     "google.golang.org/grpc"
 )
 
