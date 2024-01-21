@@ -2,29 +2,48 @@ package main
 
 import (
     "context"
+    "fmt"
     "log"
-    "net"
+    "go_service/proto/greetings" // Import the generated Go code
 
     "google.golang.org/grpc"
-    pb "github.com/SmartHobbyjd/greeterservers/go_service/proto/greetings"
 )
 
-type server struct {
-    pb.UnimplementedGreeterServer
-}
-
-func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-    return &pb.HelloReply{Message: "Hi from Go"}, nil
-}
-
 func main() {
-    lis, err := net.Listen("tcp", ":50051")
+    // Set up a connection to the Rust server
+    conn, err := grpc.Dial("[::1]:50052", grpc.WithInsecure())
     if err != nil {
-        log.Fatalf("failed to listen: %v", err)
+        log.Fatalf("Failed to dial: %v", err)
     }
-    s := grpc.NewServer()
-    pb.RegisterGreeterServer(s, &server{})
-    if err := s.Serve(lis); err != nil {
-        log.Fatalf("failed to serve: %v", err)
+    defer conn.Close()
+
+    // Create a Greeter client
+    client := greetings.NewGreeterClient(conn)
+
+    // Call the SayHello RPC
+    helloResponse, err := client.SayHello(context.Background(), &greetings.HelloRequest{
+        Name: "YourName",
+    })
+    if err != nil {
+        log.Fatalf("SayHello failed: %v", err)
     }
+    fmt.Printf("Response from Rust server: %s\n", helloResponse.Message)
+
+    // Call the SayHi RPC
+    hiResponse, err := client.SayHi(context.Background(), &greetings.HelloReply{
+        Message: "Hi from Go",
+    })
+    if err != nil {
+        log.Fatalf("SayHi failed: %v", err)
+    }
+    fmt.Printf("Response from Rust server: %s\n", hiResponse.Message)
+
+    // Call the SayThankYou RPC
+    thankYouResponse, err := client.SayThankYou(context.Background(), &greetings.ThankYouRequest{
+        Message: "Thanks from Go",
+    })
+    if err != nil {
+        log.Fatalf("SayThankYou failed: %v", err)
+    }
+    fmt.Printf("Response from Rust server: %s\n", thankYouResponse.Message)
 }

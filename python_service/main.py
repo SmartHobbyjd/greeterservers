@@ -1,19 +1,32 @@
-from concurrent import futures
 import grpc
-import greetings_pb2
-import greetings_pb2_grpc
+from greetings_pb2 import HelloRequest, HelloReply, ThankYouRequest
+from greetings_pb2_grpc import GreeterStub
 
-class Greeter(greetings_pb2_grpc.GreeterServicer):
+def run_python_client():
+    # Create channels for the Rust and Go services
+    rust_channel = grpc.insecure_channel('localhost:50052')
+    go_channel = grpc.insecure_channel('localhost:50051')
 
-    def SayHello(self, request, context):
-        return greetings_pb2.HelloReply(message='Hi from Python')
+    # Create Greeter clients for the Rust and Go services
+    rust_client = GreeterStub(rust_channel)
+    go_client = GreeterStub(go_channel)
 
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    greetings_pb2_grpc.add_GreeterServicer_to_server(Greeter(), server)
-    server.add_insecure_port('[::]:50053')
-    server.start()
-    server.wait_for_termination()
+    # Send requests to the Rust service
+    rust_request = HelloRequest(name="Python to Rust")
+    rust_response = rust_client.SayHello(rust_request)
+    print(f"Response from Rust: {rust_response.message}")
 
-if __name__ == '__main__':
-    serve()
+    # Send requests to the Go service
+    go_request = HelloReply(message="Python to Go")
+    go_response = go_client.SayHi(go_request)
+    print(f"Response from Go: {go_response.message}")
+
+    # Send a request to the Rust service
+    rust_thank_you_request = ThankYouRequest(message="Thanks from Python to Rust")
+    rust_thank_you_response = rust_client.SayThankYou(rust_thank_you_request)
+    print(f"Response from Rust: {rust_thank_you_response.message}")
+
+if __name__ == "__main__":
+    run_python_client()
+
+
