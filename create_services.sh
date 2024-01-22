@@ -232,7 +232,7 @@ import (
     "context"
     "fmt"
     "log"
-    "go_service/proto/greetings" // Updated import path
+    "../proto/greetings" // Updated import path
     "google.golang.org/grpc"
 )
 
