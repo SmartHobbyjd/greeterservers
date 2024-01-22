@@ -38,6 +38,20 @@ message WelcomeReply {
 
 EOF
 
+# Create client_service/unified_client/unified_client.go file
+cat <<'EOF' > client_service/unified_client/unified_client.go
+// client_service/unified_client/unified_client.go
+package unified_client
+
+type UnifiedClient interface {
+	SendGoRequest() (string, error)
+	SendRustRequest() (string, error)
+	SendPythonRequest() (string, error)
+	Close()
+}
+EOF
+
+
 # Create client_service/main.go file
 cat <<'EOF' > client_service/main.go
 // client_service/main.go
@@ -89,59 +103,154 @@ EOF
 
 # creatin client_service/go_client/go_client.go file
 cat <<'EOF' > client_service/go_client/go_client.go
-// client_service/go_client/go_client/go_client.go
+// client_service/go_client/go_client.go
 
+// client_service/go_client/go_client.go
 package go_client
 
 import (
-    "context"
-    "log"
-    "go_service/proto/greetings" // Import the generated Go code
-    "google.golang.org/grpc"
+	"context"
+	"log"
+	"client_service/unified_client"
+	"client_service/proto/greetings"
+	"google.golang.org/grpc"
 )
 
-// GoClient represents the Go client for communication with the Go server.
 type GoClient struct {
-    conn    *grpc.ClientConn
-    client  greetings.GreeterClient
+	conn   *grpc.ClientConn
+	client greetings.GreeterClient
 }
 
-// NewGoClient initializes a new Go client.
 func NewGoClient(serverAddress string) (*GoClient, error) {
-    conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())
-    if err != nil {
-        return nil, err
-    }
+	conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
 
-    client := greetings.NewGreeterClient(conn)
-    return &GoClient{
-        conn:    conn,
-        client:  client,
-    }, nil
+	client := greetings.NewGreeterClient(conn)
+	return &GoClient{
+		conn:   conn,
+		client: client,
+	}, nil
 }
 
-// Close closes the connection to the server.
+func (gc *GoClient) SendGoRequest() (string, error) {
+	ctx := context.Background()
+	response, err := gc.client.SayHi(ctx, &greetings.HelloReply{
+		Message: "Hello from Go Client",
+	})
+	if err != nil {
+		log.Printf("Go server communication error: %v", err)
+		return "", err
+	}
+	return response.Message, nil
+}
+
 func (gc *GoClient) Close() {
-    if gc.conn != nil {
-        gc.conn.Close()
-    }
+	if gc.conn != nil {
+		gc.conn.Close()
+	}
 }
 
-// SendRequest sends a request to the Go server and returns the response message.
-func (gc *GoClient) SendRequest() (string, error) {
-    // Create a context for the request
-    ctx := context.Background()
+EOF
 
-    // Send the request to the Go server
-    response, err := gc.client.SayHi(ctx, &greetings.HelloReply{
-        Message: "Hello from Go Client",
-    })
-    if err != nil {
-        log.Printf("Go server communication error: %v", err)
-        return "", err
-    }
+# Create client_service/rust_client/rust_client.go
+cat <<'EOF' > client_service/rust_client/rust_client.go
+// client_service/rust_client/rust_client.go
+package rust_client
 
-    return response.Message, nil
+import (
+	"context"
+	"log"
+	"client_service/unified_client"
+	"client_service/proto/greetings"
+	"google.golang.org/grpc"
+)
+
+type RustClient struct {
+	conn   *grpc.ClientConn
+	client greetings.GreeterClient
+}
+
+func NewRustClient(serverAddress string) (*RustClient, error) {
+	conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+
+	client := greetings.NewGreeterClient(conn)
+	return &RustClient{
+		conn:   conn,
+		client: client,
+	}, nil
+}
+
+func (rc *RustClient) SendRustRequest() (string, error) {
+	ctx := context.Background()
+	response, err := rc.client.SayHi(ctx, &greetings.HelloReply{
+		Message: "Hello from Rust Client",
+	})
+	if err != nil {
+		log.Printf("Rust server communication error: %v", err)
+		return "", err
+	}
+	return response.Message, nil
+}
+
+func (rc *RustClient) Close() {
+	if rc.conn != nil {
+		rc.conn.Close()
+	}
+}
+EOF
+
+# Create client_service/python_client/python_client.go
+cat <<'EOF' > client_service/python_client/python_client.go
+// client_service/python_client/python_client.go
+package python_client
+
+import (
+	"context"
+	"log"
+	"client_service/unified_client"
+	"client_service/proto/greetings"
+	"google.golang.org/grpc"
+)
+
+type PythonClient struct {
+	conn   *grpc.ClientConn
+	client greetings.GreeterClient
+}
+
+func NewPythonClient(serverAddress string) (*PythonClient, error) {
+	conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+
+	client := greetings.NewGreeterClient(conn)
+	return &PythonClient{
+		conn:   conn,
+		client: client,
+	}, nil
+}
+
+func (pc *PythonClient) SendPythonRequest() (string, error) {
+	ctx := context.Background()
+	response, err := pc.client.SayHi(ctx, &greetings.HelloReply{
+		Message: "Hello from Python Client",
+	})
+	if err != nil {
+		log.Printf("Python server communication error: %v", err)
+		return "", err
+	}
+	return response.Message, nil
+}
+
+func (pc *PythonClient) Close() {
+	if pc.conn != nil {
+		pc.conn.Close()
+	}
 }
 EOF
 
@@ -225,53 +334,106 @@ EOF
 
 # Create Go service file
 cat <<'EOF' > go_service/main.go
+// client_service/main.go
 package main
 
 import (
-    "context"
-    "fmt"
-    "log"
-    "go_service/proto/greetings" // Updated import path
-    "google.golang.org/grpc"
+	"fmt"
+	"log"
+	"client_service/unified_client"
+	"client_service/go_client"
+	"client_service/rust_client"
+	"client_service/python_client"
+	"client_service/sqlite_handler"
+	"time"
 )
 
 func main() {
-    // Set up a connection to the server (Rust or Python)
-    conn, err := grpc.Dial("[::1]:50052", grpc.WithInsecure())
-    if err != nil {
-        log.Fatalf("Failed to dial: %v", err)
-    }
-    defer conn.Close()
+	// Initialize the unified clients
+	goClient, err := go_client.NewGoClient("localhost:50051")
+	if err != nil {
+		log.Fatalf("Failed to initialize Go client: %v", err)
+	}
+	defer goClient.Close()
 
-    // Create a Greeter client
-    client := greetings.NewGreeterClient(conn)
+	rustClient, err := rust_client.NewRustClient("localhost:50052")
+	if err != nil {
+		log.Fatalf("Failed to initialize Rust client: %v", err)
+	}
+	defer rustClient.Close()
 
-    // Call the SayHello RPC
-    helloResponse, err := client.SayHello(context.Background(), &greetings.HelloRequest{
-        Name: "YourName",
-    })
-    if err != nil {
-        log.Fatalf("SayHello failed: %v", err)
-    }
-    fmt.Printf("Response from server: %s\n", helloResponse.Message)
+	pythonClient, err := python_client.NewPythonClient("localhost:50053")
+	if err != nil {
+		log.Fatalf("Failed to initialize Python client: %v", err)
+	}
+	defer pythonClient.Close()
 
-    // Call the SayHi RPC
-    hiResponse, err := client.SayHi(context.Background(), &greetings.HelloReply{
-        Message: "Hi from Go",
-    })
-    if err != nil {
-        log.Fatalf("SayHi failed: %v", err)
-    }
-    fmt.Printf("Response from server: %s\n", hiResponse.Message)
+	// Initialize SQLite database
+	db, err := sqlite_handler.InitializeDB()
+	if err != nil {
+		log.Fatalf("Failed to initialize SQLite: %v", err)
+	}
+	defer db.Close()
 
-    // Call the SayThankYou RPC
-    thankYouResponse, err := client.SayThankYou(context.Background(), &greetings.ThankYouRequest{
-        Message: "Thanks from Go",
-    })
-    if err != nil {
-        log.Fatalf("SayThankYou failed: %v", err)
-    }
-    fmt.Printf("Response from server: %s\n", thankYouResponse.Message)
+	// Track the time taken by each server for Go
+	startTime := time.Now()
+
+	// Send a request to the Go server using the unified client
+	goResponse, err := goClient.SendGoRequest()
+	if err != nil {
+		log.Printf("Go server communication error: %v", err)
+	}
+
+	// Display the Go server's response and time taken
+	goDuration := time.Since(startTime)
+	fmt.Printf("Go server response: %s\n", goResponse)
+	fmt.Printf("Go server response time: %s\n", goDuration)
+
+	// Store communication in SQLite for Go
+	if err := sqlite_handler.StoreCommunication(db, "Go", goResponse); err != nil {
+		log.Printf("Failed to store communication in SQLite: %v", err)
+	}
+
+	// Track the time taken by each server for Rust
+	startTime = time.Now()
+
+	// Send a request to the Rust server using the unified client
+	rustResponse, err := rustClient.SendRustRequest()
+	if err != nil {
+		log.Printf("Rust server communication error: %v", err)
+	}
+
+	// Display the Rust server's response and time taken
+	rustDuration := time.Since(startTime)
+	fmt.Printf("Rust server response: %s\n", rustResponse)
+	fmt.Printf("Rust server response time: %s\n", rustDuration)
+
+	// Store communication in SQLite for Rust
+	if err := sqlite_handler.StoreCommunication(db, "Rust", rustResponse); err != nil {
+		log.Printf("Failed to store communication in SQLite: %v", err)
+	}
+
+	// Track the time taken by each server for Python
+	startTime = time.Now()
+
+	// Send a request to the Python server using the unified client
+	pythonResponse, err := pythonClient.SendPythonRequest()
+	if err != nil {
+		log.Printf("Python server communication error: %v", err)
+	}
+
+	// Display the Python server's response and time taken
+	pythonDuration := time.Since(startTime)
+	fmt.Printf("Python server response: %s\n", pythonResponse)
+	fmt.Printf("Python server response time: %s\n", pythonDuration)
+
+	// Store communication in SQLite for Python
+	if err := sqlite_handler.StoreCommunication(db, "Python", pythonResponse); err != nil {
+		log.Printf("Failed to store communication in SQLite: %v", err)
+	}
+
+	// Print the success message after all servers have responded
+	fmt.Println("All servers have responded.")
 }
 EOF
 
@@ -495,7 +657,7 @@ EOF
 
 cd client_service
 go mod init client_service
-go mod tidy
+#go mod tidy
 cd ..
 
 cd go_service
@@ -533,6 +695,29 @@ cd ..
 
 docker ps -a
 docker-compose down
+
+# Create client_service Dockerfile
+cat <<'EOF' > client_service/Dockerfile
+# Use an official Golang runtime as a parent image
+FROM golang:latest
+
+WORKDIR /client_service
+
+# Copy the Go module files
+COPY go.mod .
+COPY go.sum .
+
+# Copy the entire project
+COPY . .
+
+# Build the Go application
+RUN go build -o main .
+
+EXPOSE 8585
+
+CMD ["./main"]
+
+EOF
 
 # Create go_service Dockerfile
 cat <<'EOF' > go_service/Dockerfile
@@ -592,28 +777,5 @@ RUN cargo install --path .
 EXPOSE 50052
 
 CMD ["rust","./src/main.rs"]
-
-EOF
-
-# Create client_service Dockerfile
-cat <<'EOF' > client_service/Dockerfile
-# Use an official Golang runtime as a parent image
-FROM golang:latest
-
-WORKDIR /client_service
-
-# Copy the Go module files
-COPY go.mod .
-COPY go.sum .
-
-# Copy the rest of the source code
-COPY . .
-
-# Build the Go application
-RUN go build -o main .
-
-EXPOSE 8585
-
-CMD ["./main", "-port", "8585"]
 
 EOF

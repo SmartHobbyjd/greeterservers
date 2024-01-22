@@ -1,48 +1,101 @@
+// client_service/main.go
 package main
 
 import (
-    "context"
-    "fmt"
-    "log"
-    "go_service/proto/greetings" // Updated import path
-    "google.golang.org/grpc"
+	"fmt"
+	"log"
+	"client_service/unified_client"
+	"client_service/go_client"
+	"client_service/rust_client"
+	"client_service/python_client"
+	"client_service/sqlite_handler"
+	"time"
 )
 
 func main() {
-    // Set up a connection to the server (Rust or Python)
-    conn, err := grpc.Dial("[::1]:50052", grpc.WithInsecure())
-    if err != nil {
-        log.Fatalf("Failed to dial: %v", err)
-    }
-    defer conn.Close()
+	// Initialize the unified clients
+	goClient, err := go_client.NewGoClient("localhost:50051")
+	if err != nil {
+		log.Fatalf("Failed to initialize Go client: %v", err)
+	}
+	defer goClient.Close()
 
-    // Create a Greeter client
-    client := greetings.NewGreeterClient(conn)
+	rustClient, err := rust_client.NewRustClient("localhost:50052")
+	if err != nil {
+		log.Fatalf("Failed to initialize Rust client: %v", err)
+	}
+	defer rustClient.Close()
 
-    // Call the SayHello RPC
-    helloResponse, err := client.SayHello(context.Background(), &greetings.HelloRequest{
-        Name: "YourName",
-    })
-    if err != nil {
-        log.Fatalf("SayHello failed: %v", err)
-    }
-    fmt.Printf("Response from server: %s\n", helloResponse.Message)
+	pythonClient, err := python_client.NewPythonClient("localhost:50053")
+	if err != nil {
+		log.Fatalf("Failed to initialize Python client: %v", err)
+	}
+	defer pythonClient.Close()
 
-    // Call the SayHi RPC
-    hiResponse, err := client.SayHi(context.Background(), &greetings.HelloReply{
-        Message: "Hi from Go",
-    })
-    if err != nil {
-        log.Fatalf("SayHi failed: %v", err)
-    }
-    fmt.Printf("Response from server: %s\n", hiResponse.Message)
+	// Initialize SQLite database
+	db, err := sqlite_handler.InitializeDB()
+	if err != nil {
+		log.Fatalf("Failed to initialize SQLite: %v", err)
+	}
+	defer db.Close()
 
-    // Call the SayThankYou RPC
-    thankYouResponse, err := client.SayThankYou(context.Background(), &greetings.ThankYouRequest{
-        Message: "Thanks from Go",
-    })
-    if err != nil {
-        log.Fatalf("SayThankYou failed: %v", err)
-    }
-    fmt.Printf("Response from server: %s\n", thankYouResponse.Message)
+	// Track the time taken by each server for Go
+	startTime := time.Now()
+
+	// Send a request to the Go server using the unified client
+	goResponse, err := goClient.SendGoRequest()
+	if err != nil {
+		log.Printf("Go server communication error: %v", err)
+	}
+
+	// Display the Go server's response and time taken
+	goDuration := time.Since(startTime)
+	fmt.Printf("Go server response: %s\n", goResponse)
+	fmt.Printf("Go server response time: %s\n", goDuration)
+
+	// Store communication in SQLite for Go
+	if err := sqlite_handler.StoreCommunication(db, "Go", goResponse); err != nil {
+		log.Printf("Failed to store communication in SQLite: %v", err)
+	}
+
+	// Track the time taken by each server for Rust
+	startTime = time.Now()
+
+	// Send a request to the Rust server using the unified client
+	rustResponse, err := rustClient.SendRustRequest()
+	if err != nil {
+		log.Printf("Rust server communication error: %v", err)
+	}
+
+	// Display the Rust server's response and time taken
+	rustDuration := time.Since(startTime)
+	fmt.Printf("Rust server response: %s\n", rustResponse)
+	fmt.Printf("Rust server response time: %s\n", rustDuration)
+
+	// Store communication in SQLite for Rust
+	if err := sqlite_handler.StoreCommunication(db, "Rust", rustResponse); err != nil {
+		log.Printf("Failed to store communication in SQLite: %v", err)
+	}
+
+	// Track the time taken by each server for Python
+	startTime = time.Now()
+
+	// Send a request to the Python server using the unified client
+	pythonResponse, err := pythonClient.SendPythonRequest()
+	if err != nil {
+		log.Printf("Python server communication error: %v", err)
+	}
+
+	// Display the Python server's response and time taken
+	pythonDuration := time.Since(startTime)
+	fmt.Printf("Python server response: %s\n", pythonResponse)
+	fmt.Printf("Python server response time: %s\n", pythonDuration)
+
+	// Store communication in SQLite for Python
+	if err := sqlite_handler.StoreCommunication(db, "Python", pythonResponse); err != nil {
+		log.Printf("Failed to store communication in SQLite: %v", err)
+	}
+
+	// Print the success message after all servers have responded
+	fmt.Println("All servers have responded.")
 }
