@@ -13,7 +13,7 @@ syntax = "proto3";
 package greetings;
 
 // Specify the Go package for the generated code.
-option go_package = "proto/greetings";
+option go_package = "go_service/proto/greetings";
 
 service Greeter {
   rpc SayHello (HelloRequest) returns (HelloReply) {}
@@ -232,7 +232,7 @@ import (
     "context"
     "fmt"
     "log"
-    "../proto/greetings" // Updated import path
+    "go_service/proto/greetings" // Updated import path
     "google.golang.org/grpc"
 )
 

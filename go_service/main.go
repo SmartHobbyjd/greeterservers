@@ -4,7 +4,7 @@ import (
     "context"
     "fmt"
     "log"
-    "../proto/greetings" // Updated import path
+    "go_service/proto/greetings" // Updated import path
     "google.golang.org/grpc"
 )
 
