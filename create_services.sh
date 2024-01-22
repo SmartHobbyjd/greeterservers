@@ -590,12 +590,14 @@ cat <<'EOF' > client_service/Dockerfile
 FROM golang:latest
 
 # Set the working directory inside the container
-WORKDIR /go/src/app
+WORKDIR /client_service
 
-# Copy the local Go code into the container
+# Copy the Go module files
+COPY go.mod .
+COPY go.sum .
+
+# Copy the rest of the source code
 COPY . .
-
-# Install any dependencies if needed (e.g., go get ...)
 
 # Build the Go application
 RUN go build -o main .
