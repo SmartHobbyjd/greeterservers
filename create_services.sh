@@ -486,7 +486,6 @@ EOF
 
 cd client_service
 go mod init client_service
-go mod tidy
 cd ..
 
 cd go_service
