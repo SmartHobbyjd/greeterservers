@@ -9,7 +9,7 @@ COPY go.mod .
 COPY go.sum .
 
 # Copy the rest of the source code
-COPY . .
+COPY . /client_service .
 
 # Build the Go application
 RUN go build -o main .
