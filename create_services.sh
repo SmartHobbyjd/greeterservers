@@ -1,10 +1,9 @@
 #!/bin/bash
 
 # Delete existing directories
-rm -rf go_service rust_service python_service proto rust_service/src .github/workflows client_service
-
+rm -rf go_service rust_service python_service proto rust_service/src .github/workflows client_service client_service/go_client client_service/sqlite_handler
 # Create directories
-mkdir -p go_service rust_service python_service proto rust_service/src .github/workflows client_service
+mkdir -p go_service rust_service python_service proto rust_service/src .github/workflows client_service client_service/go_client client_service/sqlite_handler
 
 # Create .proto file
 cat <<'EOF' > proto/greetings.proto
