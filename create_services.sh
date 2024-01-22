@@ -232,12 +232,12 @@ import (
     "context"
     "fmt"
     "log"
-    "../proto/greetings" // Adjusted relative import path
+    "go_service/proto/greetings" // Updated import path
     "google.golang.org/grpc"
 )
 
 func main() {
-    // Set up a connection to the server (could be Rust or Python)
+    // Set up a connection to the server (Rust or Python)
     conn, err := grpc.Dial("[::1]:50052", grpc.WithInsecure())
     if err != nil {
         log.Fatalf("Failed to dial: %v", err)
