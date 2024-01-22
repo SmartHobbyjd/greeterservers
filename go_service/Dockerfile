@@ -1,6 +1,6 @@
 FROM golang:latest
 
-WORKDIR /app
+WORKDIR /go_service
 
 # Copy the Go module files and download dependencies
 COPY ./go_service/go.mod ./go_service/go.sum ./

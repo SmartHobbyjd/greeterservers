@@ -1,6 +1,6 @@
 FROM python:3.9
 
-WORKDIR /app
+WORKDIR /python_service
 
 # Copy the requirements.txt file into the container
 COPY ./python_service/requirements.txt .

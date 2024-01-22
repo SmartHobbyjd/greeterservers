@@ -525,7 +525,7 @@ docker-compose down
 cat <<'EOF' > go_service/Dockerfile
 FROM golang:latest
 
-WORKDIR /app
+WORKDIR /go_service
 
 # Copy the Go module files and download dependencies
 COPY ./go_service/go.mod ./go_service/go.sum ./
@@ -547,7 +547,7 @@ EOF
 cat <<'EOF' > python_service/Dockerfile
 FROM python:3.9
 
-WORKDIR /app
+WORKDIR /python_service
 
 # Copy the requirements.txt file into the container
 COPY ./python_service/requirements.txt .
@@ -568,7 +568,7 @@ EOF
 cat <<'EOF' > rust_service/Dockerfile
 FROM rust:latest
 
-WORKDIR /usr/src/app
+WORKDIR /rust_service
 
 COPY . .
 

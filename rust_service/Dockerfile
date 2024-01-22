@@ -1,6 +1,6 @@
 FROM rust:latest
 
-WORKDIR /usr/src/app
+WORKDIR /rust_service
 
 COPY . .
 
