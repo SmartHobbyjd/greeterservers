@@ -87,9 +87,9 @@ func main() {
 }
 EOF
 
-# creatin client_service/go_client.go file
-cat <<'EOF' > client_service/go_client.go
-// client_service/go_client/go_client.go
+# creatin client_service/go_client/go_client.go file
+cat <<'EOF' > client_service/go_clientgo_client.go
+// client_service/go_client/go_client/go_client.go
 
 package go_client
 
@@ -592,7 +592,7 @@ cat <<'EOF' > client_service/Dockerfile
 FROM golang:latest
 
 # Set the working directory inside the container
-WORKDIR ./client_service
+WORKDIR ./client_service/
 
 # Copy the Go module files
 COPY go.mod .

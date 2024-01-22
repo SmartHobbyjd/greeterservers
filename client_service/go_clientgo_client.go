@@ -1,4 +1,4 @@
-// client_service/go_client/go_client.go
+// client_service/go_client/go_client/go_client.go
 
 package go_client
 
