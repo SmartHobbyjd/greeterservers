@@ -88,7 +88,7 @@ func main() {
 EOF
 
 # creatin client_service/go_client/go_client.go file
-cat <<'EOF' > client_service/go_clientgo_client.go
+cat <<'EOF' > client_service/go_client/go_client.go
 // client_service/go_client/go_client/go_client.go
 
 package go_client
@@ -145,9 +145,9 @@ func (gc *GoClient) SendRequest() (string, error) {
 }
 EOF
 
-# Create client_service/sqlite_handler.go file
-cat <<'EOF' > client_service/sqlite_handler.go
-// client_service/sqlite_handler.go
+# Create client_service/sqlite_handler/sqlite_handler.go file
+cat <<'EOF' > client_service/sqlite_handler/sqlite_handler.go
+// client_service/sqlite_handler/sqlite_handler.go
 
 package sqlite_handler
 

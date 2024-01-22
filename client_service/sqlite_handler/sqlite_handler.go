@@ -1,4 +1,4 @@
-// client_service/sqlite_handler.go
+// client_service/sqlite_handler/sqlite_handler.go
 
 package sqlite_handler
 
