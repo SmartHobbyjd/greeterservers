@@ -4,11 +4,7 @@ FROM golang:latest
 # Set the working directory inside the container
 WORKDIR /client_service
 
-# Copy the Go module files
-COPY go.mod .
-COPY go.sum .
-
-# Copy the rest of the source code
+# Copy the entire project into the container
 COPY . .
 
 # Build the Go application
