@@ -485,6 +485,11 @@ jobs:
         args: --manifest-path rust_service/Cargo.toml
 EOF
 
+cd client_service
+go mod init client_service
+go mod tidy
+cd ..
+
 cd go_service
  # Initialize Go module
  go mod init go_service
