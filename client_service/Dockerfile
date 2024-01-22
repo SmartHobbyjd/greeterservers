@@ -2,7 +2,7 @@
 FROM golang:latest
 
 # Set the working directory inside the container
-WORKDIR /client_service
+WORKDIR ./client_service
 
 # Copy the Go module files
 COPY go.mod .
