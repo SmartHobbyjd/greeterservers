@@ -1,13 +1,16 @@
 name: Continuous Integration
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
     - name: Set up Go
       uses: actions/setup-go@v2
@@ -17,6 +20,11 @@ jobs:
     - name: Build Go Service
       run: |
         cd go_service
+        go build
+
+    - name: Build Client Service
+      run: |
+        cd client_service
         go build
 
     - name: Build Python Service
@@ -30,3 +38,4 @@ jobs:
       with:
         command: build
         args: --manifest-path rust_service/Cargo.toml
+

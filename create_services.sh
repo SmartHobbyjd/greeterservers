@@ -452,14 +452,17 @@ EOF
 cat <<'EOF' > .github/workflows/ci.yml
 name: Continuous Integration
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
     - name: Set up Go
       uses: actions/setup-go@v2
@@ -469,6 +472,11 @@ jobs:
     - name: Build Go Service
       run: |
         cd go_service
+        go build
+
+    - name: Build Client Service
+      run: |
+        cd client_service
         go build
 
     - name: Build Python Service
@@ -482,6 +490,7 @@ jobs:
       with:
         command: build
         args: --manifest-path rust_service/Cargo.toml
+
 EOF
 
 cd client_service
@@ -591,18 +600,20 @@ cat <<'EOF' > client_service/Dockerfile
 # Use an official Golang runtime as a parent image
 FROM golang:latest
 
-# Set the working directory inside the container
 WORKDIR /client_service
 
-# Copy the entire project into the container
+# Copy the Go module files
+COPY go.mod .
+COPY go.sum .
+
+# Copy the rest of the source code
 COPY . .
 
 # Build the Go application
 RUN go build -o main .
 
-# Expose port 8585 for the Go client to listen on
 EXPOSE 8585
 
-# Run the Go client on port 8585 when the container starts
 CMD ["./main", "-port", "8585"]
+
 EOF
