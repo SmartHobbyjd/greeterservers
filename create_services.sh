@@ -599,16 +599,17 @@ services:
       - "50053:50053"
     container_name: python_service_container
 
-  go_client_service:
-    build:
-      context: .
-      dockerfile: client_service/Dockerfile  # Specify the path to your Go client Dockerfile
-    ports:
-      - "8585:8585"  # Specify the desired port for your Go client
-    container_name: go_client_container
-    depends_on:
-      - go_service  # Ensure that the Go client service starts after the Go server service
 EOF
+
+  #go_client_service:
+  #  build:
+  #    context: .
+  #    dockerfile: client_service/Dockerfile  # Specify the path to your Go client Dockerfile
+  #  ports:
+  #    - "8585:8585"  # Specify the desired port for your Go client
+  #  container_name: go_client_container
+  #  depends_on:
+  #    - go_service  # Ensure that the Go client service starts after the Go server service
 
 # Create .github/workflows/ci.yml file
 cat <<'EOF' > .github/workflows/ci.yml
