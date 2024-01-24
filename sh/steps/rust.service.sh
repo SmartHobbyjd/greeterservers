@@ -1,3 +1,5 @@
+# Create Rust service file
+cat <<'EOF' > rust_service/src/main.rs
 use tonic::{transport::Server, Request, Response, Status};
 
 pub mod hello_world {
@@ -64,3 +66,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+EOF
+
+# Create build.rs file for Rust service
+cat <<'EOF' > rust_service/build.rs
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tonic_build::compile_protos("../proto/greetings.proto")?;
+    Ok(())
+}
+EOF
+
+# Create Cargo.toml for Rust service
+cat <<EOF > rust_service/Cargo.toml
+[package]
+name = "rust_service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tonic = "0.6"
+prost = "0.9"
+tokio = { version = "1", features = ["full"] }
+
+[build-dependencies]
+tonic-build = "0.6"
+EOF

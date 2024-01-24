@@ -1,3 +1,5 @@
+# Create Python service file
+cat <<'EOF' > python_service/main.py
 import grpc
 from greetings_pb2 import HelloRequest, HelloReply, ThankYouRequest
 from greetings_pb2_grpc import GreeterStub
@@ -28,3 +30,4 @@ def run_python_client():
 
 if __name__ == "__main__":
     run_python_client()
+EOF

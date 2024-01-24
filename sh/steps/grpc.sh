@@ -1,3 +1,5 @@
+# Create .proto file
+cat <<'EOF' > proto/greetings.proto
 syntax = "proto3";
 
 package greetings;
@@ -27,3 +29,4 @@ message WelcomeReply {
   string message = 1;
 }
 
+EOF

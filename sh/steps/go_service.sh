@@ -1,3 +1,5 @@
+# Create Go service file
+cat <<'EOF' > go_service/main.go
 // client_service/main.go
 package main
 
@@ -99,3 +101,4 @@ func main() {
 	// Print the success message after all servers have responded
 	fmt.Println("All servers have responded.")
 }
+EOF
