@@ -1,19 +1,34 @@
-# Use an official Golang runtime as a parent image
-FROM golang:latest
+# Use the official Node.js LTS image as the base image
+FROM node:lts-alpine AS build
 
-WORKDIR /client_service
+# Set the working directory inside the container
+WORKDIR /app
 
-# Copy the Go module files
-COPY go.mod .
-COPY go.sum .
+# Copy package.json and package-lock.json to the container
+COPY package*.json ./
 
-# Copy the entire project
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code to the container
 COPY . .
 
-# Build the Go application
-RUN go build -o main .
+# Build the Next.js application
+RUN npm run build
 
-EXPOSE 8585
+# Use a lighter-weight image for production
+FROM node:lts-alpine
 
-CMD ["./main"]
+# Set the working directory inside the container
+WORKDIR /app
 
+# Copy the build artifacts from the build stage to the final image
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package*.json ./
+
+# Expose the port on which the application will run
+EXPOSE 3000
+
+# Start the Next.js application
+CMD ["npm", "start"]

@@ -38,9 +38,9 @@ message WelcomeReply {
 
 EOF
 
-# Create client_service/unified_client/unified_client.go file
-cat <<'EOF' > client_service/unified_client/unified_client.go
-// client_service/unified_client/unified_client.go
+# Create client_service_go/unified_client/unified_client.go file
+cat <<'EOF' > client_service_go/unified_client/unified_client.go
+// client_service_go/unified_client/unified_client.go
 package unified_client
 
 type UnifiedClient interface {
@@ -52,9 +52,9 @@ type UnifiedClient interface {
 EOF
 
 
-# Create client_service/main.go file
-cat <<'EOF' > client_service/main.go
-// client_service/main.go
+# Create client_service_go/main.go file
+cat <<'EOF' > client_service_go/main.go
+// client_service_go/main.go
 package main
 
 import (
@@ -101,9 +101,9 @@ func main() {
 }
 EOF
 
-# creatin client_service/go_client/go_client.go file
-cat <<'EOF' > client_service/go_client/go_client.go
-// client_service/go_client/go_client.go
+# creatin client_service_go/go_client/go_client.go file
+cat <<'EOF' > client_service_go/go_client/go_client.go
+// client_service_go/go_client/go_client.go
 
 // client_service/go_client/go_client.go
 package go_client
@@ -154,9 +154,9 @@ func (gc *GoClient) Close() {
 
 EOF
 
-# Create client_service/rust_client/rust_client.go
-cat <<'EOF' > client_service/rust_client/rust_client.go
-// client_service/rust_client/rust_client.go
+# Create client_service_go/rust_client/rust_client.go
+cat <<'EOF' > client_service_go/rust_client/rust_client.go
+// client_service_go/rust_client/rust_client.go
 package rust_client
 
 import (
@@ -204,9 +204,9 @@ func (rc *RustClient) Close() {
 }
 EOF
 
-# Create client_service/python_client/python_client.go
-cat <<'EOF' > client_service/python_client/python_client.go
-// client_service/python_client/python_client.go
+# Create client_service_go/python_client/python_client.go
+cat <<'EOF' > client_service_go/python_client/python_client.go
+// client_service_go/python_client/python_client.go
 package python_client
 
 import (
@@ -254,9 +254,9 @@ func (pc *PythonClient) Close() {
 }
 EOF
 
-# Create client_service/sqlite_handler/sqlite_handler.go file
-cat <<'EOF' > client_service/sqlite_handler/sqlite_handler.go
-// client_service/sqlite_handler/sqlite_handler.go
+# Create client_service_go/sqlite_handler/sqlite_handler.go file
+cat <<'EOF' > client_service_go/sqlite_handler/sqlite_handler.go
+// client_service_go/sqlite_handler/sqlite_handler.go
 
 package sqlite_handler
 
@@ -563,8 +563,59 @@ def run_python_client():
 
 if __name__ == "__main__":
     run_python_client()
+EOF
 
+# Create utils/api.js file
+cat <<'EOF' > client_service/utils/api.js
+// utils/api.js
+import axios from 'axios';
 
+const API_BASE_URL = 'http://localhost:8585'; // Update with your Go client service address
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+export const sendRequestToGo = async () => {
+  try {
+    const response = await api.get('/go-endpoint'); // Update with your actual endpoint
+    return response.data;
+  } catch (error) {
+    console.error('Error sending request to Go:', error);
+    throw error;
+  }
+};
+
+// Repeat similar steps for Rust and Python endpoints
+EOF
+
+# Create client_service/pages/index.js file
+cat <<'EOF' > client_service/pages/index.js
+// pages/index.js
+import React from 'react';
+import { useQuery } from 'react-query';
+import { sendRequestToGo } from '../utils/api';
+
+const HomePage = () => {
+  const { data, error, isLoading } = useQuery('goData', sendRequestToGo);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading data</div>;
+  }
+
+  return (
+    <div>
+      <h1>Data from Go Service</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
+};
+
+export default HomePage;
 EOF
 
 # List all files with names and extensions
@@ -598,6 +649,15 @@ services:
     ports:
       - "50053:50053"
     container_name: python_service_container
+
+  client_service:
+    build:
+      context: .
+      dockerfile: client_service/Dockerfile
+    ports:
+      - "3000:3000"
+    container_name: client_service_container
+
 
 EOF
 
@@ -654,6 +714,22 @@ jobs:
         command: build
         args: --manifest-path rust_service/Cargo.toml
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14'
+
+    - name: Build Next.js App
+      run: |
+        cd client_service
+        npm install
+        npm run build
+
+    - name: Dockerize Next.js App
+      run: |
+        cd client_service
+        docker build -t client_service:latest .
+
 EOF
 
 cd client_service
@@ -698,26 +774,64 @@ docker ps -a
 docker-compose down
 
 # Create client_service Dockerfile
-cat <<'EOF' > client_service/Dockerfile
+#cat <<'EOF' > client_service/Dockerfile
 # Use an official Golang runtime as a parent image
-FROM golang:latest
+#FROM golang:latest
 
-WORKDIR /client_service
+#WORKDIR /client_service
 
 # Copy the Go module files
-COPY go.mod .
-COPY go.sum .
+#COPY go.mod .
+#COPY go.sum .
 
 # Copy the entire project
-COPY . .
+#COPY . .
 
 # Build the Go application
-RUN go build -o main .
+#RUN go build -o main .
 
-EXPOSE 8585
+#EXPOSE 8585
 
-CMD ["./main"]
+#CMD ["./main"]
 
+#EOF
+
+# Create client_service Dockerfile
+cat <<'EOF' > client_service/Dockerfile
+# Use the official Node.js LTS image as the base image
+FROM node:lts-alpine AS build
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json to the container
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code to the container
+COPY . .
+
+# Build the Next.js application
+RUN npm run build
+
+# Use a lighter-weight image for production
+FROM node:lts-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the build artifacts from the build stage to the final image
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package*.json ./
+
+# Expose the port on which the application will run
+EXPOSE 3000
+
+# Start the Next.js application
+CMD ["npm", "start"]
 EOF
 
 # Create go_service Dockerfile

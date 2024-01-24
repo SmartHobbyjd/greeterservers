@@ -39,3 +39,19 @@ jobs:
         command: build
         args: --manifest-path rust_service/Cargo.toml
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14'
+
+    - name: Build Next.js App
+      run: |
+        cd client_service
+        npm install
+        npm run build
+
+    - name: Dockerize Next.js App
+      run: |
+        cd client_service
+        docker build -t client_service:latest .
+

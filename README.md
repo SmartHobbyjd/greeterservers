@@ -48,3 +48,11 @@ And for our Windows aficionados, conquer the realm with the Windows Subsystem fo
    ```
 
 Embark on this thrilling journey, and don't forget to drop your thoughts on our website. Your feedback fuels the engine of progress! 🚀💻✨
+
+Here are the on goin progress:
+React.js with Next.js application.
+
+npx create-next-app client_service
+cd client_service
+npm install axios react-query
+

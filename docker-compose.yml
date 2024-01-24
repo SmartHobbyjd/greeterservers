@@ -24,3 +24,12 @@ services:
       - "50053:50053"
     container_name: python_service_container
 
+  client_service:
+    build:
+      context: .
+      dockerfile: client_service/Dockerfile
+    ports:
+      - "3000:3000"
+    container_name: client_service_container
+
+
