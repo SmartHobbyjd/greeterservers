@@ -23,6 +23,8 @@
 
 #!/bin/bash
 
+cd ..
+
 # Build and run the Docker containers
 echo "Building and running Docker containers..."
 docker-compose up -d
