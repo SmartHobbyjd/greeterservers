@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # Delete existing directories
-rm -rf go_service rust_service python_service proto rust_service/src .github/workflows client_service_go client_service
+rm -rf go_service rust_service python_service proto rust_service/src .github/workflows client_service_go client_service client_service/pages client_service/utils client_service_go/go_client client_service_go/sqlite_handler
+
 # Create directories
-mkdir -p go_service rust_service python_service proto rust_service/src .github/workflows client_service client_service_go client_service_go/go_client client_service_go/sqlite_handler
+mkdir -p go_service rust_service python_service proto rust_service/src .github/workflows client_service_go client_service client_service/pages client_service/utils client_service_go/go_client client_service_go/sqlite_handler
 
 chmod +x sh/steps/grpc.sh sh/steps/client_service.sh sh/steps/client_service_go.sh sh/steps/go_service.sh sh/steps/python_service.sh sh/steps/rust_service.sh sh/steps/docker.sh
 
