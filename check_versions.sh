@@ -28,7 +28,7 @@ echo "GitHub: github.com/smarthobbyjd"
 echo "Visit: jackdsondias.tech"
 
 # Open a URL
-URL="http://www.jacksondias.tech:3000"
+#URL="http://www.jacksondias.tech:3000"
 
 # Detect the operating system
 if [[ "$OSTYPE" == "darwin"* ]]; then

@@ -732,8 +732,8 @@ jobs:
 
 EOF
 
-cd client_service
-go mod init client_service
+cd client_service_go
+go mod init client_service_go
 #go mod tidy
 cd ..
 
