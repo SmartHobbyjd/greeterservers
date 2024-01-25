@@ -110,7 +110,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '14'
+        node-version: '148'
 
     - name: Build Next.js App
       run: |
@@ -125,54 +125,8 @@ jobs:
 
 EOF
 
-# Create Docker Compose file
-cat <<'EOF' > docker-compose.yml
-version: '3.8'
-services:
-  go_service:
-    build:
-      context: .
-      dockerfile: go_service/Dockerfile
-    ports:
-      - "50051:50051"
-    container_name: go_service_container
-
-  rust_service:
-    build:
-      context: .
-      dockerfile: rust_service/Dockerfile
-    ports:
-      - "50052:50052"
-    container_name: rust_service_container
-
-  python_service:
-    build:
-      context: .
-      dockerfile: python_service/Dockerfile
-    ports:
-      - "50053:50053"
-    container_name: python_service_container
-
-  client_service:
-    build:
-      context: .
-      dockerfile: client_service/Dockerfile
-    ports:
-      - "3000:3000"
-    container_name: client_service_container
 
 
-EOF
-
-  #go_client_service:
-  #  build:
-  #    context: .
-  #    dockerfile: client_service/Dockerfile  # Specify the path to your Go client Dockerfile
-  #  ports:
-  #    - "8585:8585"  # Specify the desired port for your Go client
-  #  container_name: go_client_container
-  #  depends_on:
-  #    - go_service  # Ensure that the Go client service starts after the Go server service
 
 
 

@@ -1,28 +1,28 @@
 docker ps -a
 docker-compose down
 
-# Create client_service Dockerfile
-#cat <<'EOF' > client_service/Dockerfile
+# Create client_service_go Dockerfile
+cat <<'EOF' > client_service_go/Dockerfile
 # Use an official Golang runtime as a parent image
-#FROM golang:latest
+FROM golang:latest
 
-#WORKDIR /client_service
+WORKDIR /client_service_go
 
 # Copy the Go module files
-#COPY go.mod .
-#COPY go.sum .
+COPY go.mod .
+COPY go.sum .
 
 # Copy the entire project
-#COPY . .
+COPY . .
 
 # Build the Go application
-#RUN go build -o main .
+RUN go build -o main .
 
-#EXPOSE 8585
+EXPOSE 8585
 
-#CMD ["./main"]
+CMD ["./main"]
 
-#EOF
+EOF
 
 # Create client_service Dockerfile
 cat <<'EOF' > client_service/Dockerfile
@@ -56,7 +56,7 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package*.json ./
 
 # Expose the port on which the application will run
-EXPOSE 3000
+EXPOSE 3001
 
 # Start the Next.js application
 CMD ["npm", "start"]
@@ -120,5 +120,52 @@ RUN cargo install --path .
 EXPOSE 50052
 
 CMD ["rust","./src/main.rs"]
+
+EOF
+
+# Create Docker Compose file
+cat <<'EOF' > docker-compose.yml
+version: '3.8'
+services:
+  go_service:
+    build:
+      context: .
+      dockerfile: go_service/Dockerfile
+    ports:
+      - "50051:50051"
+    container_name: go_service_container
+
+  rust_service:
+    build:
+      context: .
+      dockerfile: rust_service/Dockerfile
+    ports:
+      - "50052:50052"
+    container_name: rust_service_container
+
+  python_service:
+    build:
+      context: .
+      dockerfile: python_service/Dockerfile
+    ports:
+      - "50053:50053"
+    container_name: python_service_container
+
+  client_service:
+    build:
+      context: .
+      dockerfile: client_service/Dockerfile
+    ports:
+      - "3001:3001"
+    container_name: client_service_container
+  client_service_go:
+    build:
+      context: .
+      dockerfile: client_service_go/Dockerfile  # Specify the path to your Go client Dockerfile
+    ports:
+      - "8585:8585"  # Specify the desired port for your Go client
+    container_name: client_service_go_container
+    depends_on:
+      - go_service  # Ensure that the Go client service starts after the Go server service    
 
 EOF

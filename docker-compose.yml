@@ -29,7 +29,15 @@ services:
       context: .
       dockerfile: client_service/Dockerfile
     ports:
-      - "3000:3000"
+      - "3001:3001"
     container_name: client_service_container
-
+  client_service_go:
+    build:
+      context: .
+      dockerfile: client_service_go/Dockerfile  # Specify the path to your Go client Dockerfile
+    ports:
+      - "8585:8585"  # Specify the desired port for your Go client
+    container_name: client_service_go_container
+    depends_on:
+      - go_service  # Ensure that the Go client service starts after the Go server service    
 
