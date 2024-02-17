@@ -23,7 +23,7 @@
 
 #!/bin/bash
 
-cd ..
+#cd ..
 
 # Build and run the Docker containers
 echo "Building and running Docker containers..."

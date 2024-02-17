@@ -1,4 +1,4 @@
-Welcome to the dynamic universe of **greeterservers! 🌐🚀**
+Welcome to the dynamic universe of **ServiceSync! 🌐🚀**
 
 Get ready for a deep dive into server interaction and real-time communication. This project is all about showcasing how to handle server services, allowing you to kickstart robust projects and build amazing structures.
 
@@ -6,19 +6,19 @@ We're leveraging the powerhouse trio of Golang, Rust, and Python, communicating 
 
 Here's your no-nonsense guide to getting things up and running:
 
-**Step 1:** Navigate to /greeterservers and power up with:
+**Step 1:** Navigate to /Servicesync and power up with:
    ```bash
-   chmod +x start_check.sh run_services.sh hello_world.sh create_services.sh check_versions.sh
+   chmod +x ./init.sh
    ```
    Flex those permissions like a boss! 💪
 
 **Step 2:** Execute the game-changer:
    ```bash
-   ./start_check.sh
+   ./init.sh
    ```
    If the "./" feels extra, keep it simple:
    ```bash
-   start_check.sh
+   init.sh
    ```
    Time to witness the real action! 🚀
 
@@ -30,21 +30,7 @@ And for our Windows aficionados, conquer the realm with the Windows Subsystem fo
 
 3. March into the directory of destiny:
    ```bash
-   cd /path/to/greeterservers
-   ```
-
-4. Neutralize any permission hurdles:
-   ```bash
-   chmod +x start_check.sh run_services.sh hello_world.sh create_services.sh check_versions.sh
-   ```
-
-5. Unleash the finale:
-   ```bash
-   ./start_check.sh
-   ```
-   Or go for the straightforward:
-   ```bash
-   start_check.sh
+   cd /path/to/servicesync
    ```
 
 Embark on this thrilling journey, and don't forget to drop your thoughts on our website. Your feedback fuels the engine of progress! 🚀💻✨
@@ -55,4 +41,3 @@ React.js with Next.js application.
 npx create-next-app client_service
 cd client_service
 npm install axios react-query
-

@@ -57,6 +57,7 @@ touch requirements.txt
 # Install Python dependencies using pip3
 pip3 install grpcio
 pip3 install grpcio-tools
+pip3 install --upgrade grpcio grpcio-tools
 
 # Compile .proto file for Python
 #python3 -m grpc_tools.protoc -Iproto --python_out=python_service --grpc_python_out=python_service proto/greetings.proto
